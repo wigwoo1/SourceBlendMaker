@@ -1,0 +1,7 @@
+Parent particle updates (0.28.46)
+
+The converter now handles repeated position/previous-position inheritance for supported parent-child sprite graphs. It keeps independent per-operator selection cursors across simulation passes and preserves authored movement/copy order. Fractional or earlier-time queries do not mutate retained full-tick history.
+
+This uses the converter's approximate 120 Hz clock, birth-order active slots and a deterministic converter random stream. Source buffer compaction, killed-parent dispatch, exact simulation timing and visual parity remain unverified. Scalar copy fields and combinations with locks, model spawning, forces, collisions or other motion remain explicitly unsupported.
+
+Version 0.28.47 adds yaw scalar ramps (field 12). The original Blink smoke graph now bakes all three renderer components and saves/reopens. Independent diagnostic renders confirm output; version 0.28.48 reconstructs the distance-field outline and removes the visible card background in diagnostic renders. Exact Source visual parity is unverified.

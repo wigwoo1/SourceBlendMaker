@@ -1,0 +1,272 @@
+import numpy as np
+import zlib
+
+from SourceIO.library.utils import Buffer, MemoryBuffer
+from SourceIO.library.shared.content_manager import ContentManager
+from SourceIO.library.source1.vmt import VMT
+from SourceIO.library.utils import TinyPath
+from SourceIO.library.utils.pylib.vtf import load_vtf_texture
+from SourceIO.logger import SourceLogMan
+from SourceIO.library.utils.thirdparty.equilib.cube2equi_numpy import run as convert_to_eq
+from SourceIO.library.utils.pylib.vtf import load_vtf_texture_frames
+
+log_manager = SourceLogMan()
+logger = log_manager.get_logger('Source1::VTF')
+
+
+def load_texture(file_object):
+    data = file_object.read()
+    try:
+        pixel_data, width, height, is_float = load_vtf_texture(data)
+        if is_float:
+            rgba_data = np.frombuffer(pixel_data, dtype=np.float32).reshape(height, width, 4)
+        else:
+            rgba_data = np.frombuffer(pixel_data, dtype=np.uint8).reshape(height, width, 4).astype(np.float32) / 255
+            from .block_colors import rgb
+            corrected = rgb(data)
+            if corrected is not None:
+                if corrected.shape != (height, width, 3):
+                    raise ValueError('Compressed VTF color dimensions disagree with native decoder')
+                rgba_data[:, :, :3] = corrected.astype(np.float32) / 255
+        return rgba_data, height, width
+    except Exception as ex:
+        logger.error('Caught exception "{}" '.format(ex))
+
+    return None, 0, 0
+
+
+def load_texture_frames(file_object) -> tuple[list[np.ndarray], int, int]:
+    """Decode every animation frame of a VTF as float RGBA arrays.
+
+    ``load_texture`` only ever returns the first frame. Multi-frame VTFs back
+    Source's ``AnimatedTexture`` proxy -- e.g. HL2's 29-frame
+    ``dev/water_normal`` -- so animated materials need all of them.
+
+    Returns ``([frame, ...], height, width)``; for a single-frame texture the one
+    frame is bit-identical to :func:`load_texture`.
+    """
+    data = file_object.read()
+    try:
+        frames, width, height, is_float = load_vtf_texture_frames(data)
+    except Exception as ex:
+        logger.error('Caught exception "{}" '.format(ex))
+        return [], 0, 0
+
+    decoded = []
+    for frame in frames:
+        if is_float:
+            pixels = np.frombuffer(frame, dtype=np.float32).reshape(height, width, 4)
+        else:
+            pixels = np.frombuffer(frame, dtype=np.uint8).reshape(height, width, 4).astype(np.float32) / 255
+        decoded.append(pixels)
+    return decoded, height, width
+
+
+def load_texture_frames(file_object) -> tuple[list[np.ndarray], int, int]:
+    """Decode every animation frame of a VTF as float RGBA arrays.
+
+    ``load_texture`` only ever returns the first frame. Multi-frame VTFs back
+    Source's ``AnimatedTexture`` proxy -- e.g. HL2's 29-frame
+    ``dev/water_normal`` -- so animated materials need all of them.
+
+    Returns ``([frame, ...], height, width)``; for a single-frame texture the one
+    frame is bit-identical to :func:`load_texture`.
+    """
+    data = file_object.read()
+    if load_vtf_texture_frames is None:
+        logger.warn('pylib is too old to extract animation frames, using first frame only')
+        rgba_data, height, width = load_texture(MemoryBuffer(data))
+        if rgba_data is None:
+            return [], 0, 0
+        return [rgba_data.reshape(height, width, -1)], height, width
+    try:
+        frames, width, height, is_float = load_vtf_texture_frames(data)
+    except Exception as ex:
+        logger.error('Caught exception "{}" '.format(ex))
+        return [], 0, 0
+
+    decoded = []
+    for frame in frames:
+        if is_float:
+            pixels = np.frombuffer(frame, dtype=np.float32).reshape(height, width, 4)
+        else:
+            pixels = np.frombuffer(frame, dtype=np.uint8).reshape(height, width, 4).astype(np.float32) / 255
+        decoded.append(pixels)
+    return decoded, height, width
+
+
+def load_texture_frames(file_object) -> tuple[list[np.ndarray], int, int]:
+    """Decode every animation frame of a VTF as float RGBA arrays.
+
+    ``load_texture`` only ever returns the first frame. Multi-frame VTFs back
+    Source's ``AnimatedTexture`` proxy -- e.g. HL2's 29-frame
+    ``dev/water_normal`` -- so animated materials need all of them.
+
+    Returns ``([frame, ...], height, width)``; for a single-frame texture the one
+    frame is bit-identical to :func:`load_texture`.
+    """
+    data = file_object.read()
+    if load_vtf_texture_frames is None:
+        logger.warn('pylib is too old to extract animation frames, using first frame only')
+        rgba_data, height, width = load_texture(MemoryBuffer(data))
+        if rgba_data is None:
+            return [], 0, 0
+        return [rgba_data.reshape(height, width, -1)], height, width
+    try:
+        frames, width, height, is_float = load_vtf_texture_frames(data)
+    except Exception as ex:
+        logger.error('Caught exception "{}" '.format(ex))
+        return [], 0, 0
+
+    decoded = []
+    for frame in frames:
+        if is_float:
+            pixels = np.frombuffer(frame, dtype=np.float32).reshape(height, width, 4)
+        else:
+            pixels = np.frombuffer(frame, dtype=np.uint8).reshape(height, width, 4).astype(np.float32) / 255
+        decoded.append(pixels)
+    if len(decoded) == 1:
+        from .block_colors import rgb
+        corrected = rgb(data)
+        if corrected is not None:
+            if corrected.shape != (height, width, 3):
+                raise ValueError('Compressed VTF frame color dimensions disagree with native decoder')
+            decoded[0][:, :, :3] = corrected.astype(np.float32) / 255
+    return decoded, height, width
+
+
+def load_texture_tth(header_file: Buffer, data_file: Buffer):
+    vtf_data = bytearray()
+    if header_file.read_ascii_string(3) != "TTH":
+        return None
+    header_file.seek(6)
+    entry_count = header_file.read_uint8()
+    header_file.skip(1)
+    header_size = header_file.read_uint32()
+    header_file.seek(16 + entry_count * 8 + 4)
+    vtf_data += header_file.read(header_size)
+    vtf_data += zlib.decompress(data_file.read())
+    memory_buffer = MemoryBuffer(vtf_data)
+    return load_texture(memory_buffer)
+
+
+def pad_to(im: np.ndarray, s_size: int):
+    new = np.zeros((s_size, s_size, 4), im.dtype)
+    new[:, :, 3] = 1
+    new[s_size - im.shape[0]:, s_size - im.shape[1]:, :] = im
+    return new
+
+
+class SkyboxException(Exception):
+    pass
+
+
+def transform_sky_face(image, material):
+    """Bake the sky shader's base UV transform with clamped bilinear sampling."""
+    transform=material.get_transform_matrix('$basetexturetransform')
+    if not transform:return image
+    height,width=image.shape[:2]
+    y,x=np.mgrid[:height,:width]
+    u=(x+.5)/width;v=(y+.5)/height
+    cx,cy=transform['center'][:2];sx,sy=transform['scale'][:2]
+    angle=transform['rotate'][2];tx,ty=transform['translate'][:2]
+    u=(u-cx)*sx;v=(v-cy)*sy
+    cosine=np.cos(angle);sine=np.sin(angle)
+    source_x=np.clip((u*cosine-v*sine+cx+tx)*width-.5,0,width-1)
+    source_y=np.clip((u*sine+v*cosine+cy+ty)*height-.5,0,height-1)
+    x0=np.floor(source_x).astype(int);y0=np.floor(source_y).astype(int)
+    x1=np.minimum(x0+1,width-1);y1=np.minimum(y0+1,height-1)
+    fx=(source_x-x0)[...,None];fy=(source_y-y0)[...,None]
+    upper=image[y0,x0]*(1-fx)+image[y0,x1]*fx
+    lower=image[y1,x0]*(1-fx)+image[y1,x1]*fx
+    return (upper*(1-fy)+lower*fy).astype(image.dtype)
+
+
+def lookup_and_load_texture(content_manager: ContentManager, texture_path: TinyPath):
+    texture_file = content_manager.find_file(texture_path)
+    if texture_file is not None:
+        return load_texture(texture_file)
+    texture_header_file = content_manager.find_file(texture_path.with_suffix(".tth"))
+    texture_data_file = content_manager.find_file(texture_path.with_suffix(".ttz"))
+    if texture_header_file is not None and texture_data_file is not None:
+        return load_texture_tth(texture_header_file, texture_data_file)
+    raise SkyboxException(f"Failed to find skybox texture {texture_path}")
+
+
+def convert_skybox_to_equiangular(skyname: str, content_manager: ContentManager, width=1024):
+    sides_names = {'B': 'bk', 'R': 'rt', 'F': 'ft', 'L': 'lf', 'U': 'dn', 'D': 'up'}
+    sides = {}
+    max_s = 0
+    use_hdr = False
+    for k, n in sides_names.items():
+        file_path = content_manager.find_file(TinyPath(f'materials/skybox/{skyname}{n}.vmt'))
+        if not file_path:
+            raise SkyboxException(f'Failed to find skybox material {skyname}{n}')
+        material = VMT(file_path, f'skybox/{skyname}{n}', content_manager)
+        use_hdr |= bool(material.get_string('$hdrbasetexture',None) or material.get_string('$hdrcompressedtexture',None))
+        texture_path = material.get_string('$basetexture', None)
+        if texture_path is None:
+            raise SkyboxException('Missing $basetexture in skybox material')
+        side, h, w = lookup_and_load_texture(content_manager, TinyPath("materials") / (texture_path + ".vtf"))
+        if side is None:
+            raise SkyboxException(f'Failed to load texture {texture_path}')
+        side = side.reshape((h, w, 4))
+        side = np.flipud(side)
+        side = transform_sky_face(side,material)
+        max_s = max(max(side.shape), max_s)
+        if side.shape[0] < max_s or side.shape[1] < max_s:
+            side = pad_to(side, max_s)
+        side = np.rot90(side, 1)
+        if k == 'D':
+            side = np.rot90(side, 1)
+        elif k == 'U':
+            side = np.flipud(side)
+        sides[k] = side.T
+    eq_map = convert_to_eq(sides, 'dict', width, width // 2, 'default', 'bilinear').T
+    main_texture = np.rot90(eq_map)
+    hdr_main_texture = None
+    hdr_alpha_texture = None
+    if use_hdr:
+        for k, n in sides_names.items():
+            file_path = content_manager.find_file(TinyPath(f'materials/skybox/{skyname}_hdr{n}.vmt'))
+            if file_path is None:
+                file_path = content_manager.find_file(TinyPath(f'materials/skybox/{skyname}{n}.vmt'))
+                material = VMT(file_path, f'skybox/{skyname}{n}', content_manager)
+            else:
+                material = VMT(file_path, f'skybox/{skyname}_hdr{n}', content_manager)
+            texture_path = material.get_string('$hdrbasetexture',
+                                               material.get_string('$hdrcompressedTexture',
+                                                                   material.get_string(
+                                                                       '$basetexture',
+                                                                       None)))
+            if texture_path is None:
+                raise SkyboxException('Missing $basetexture in skybox material')
+            side, h, w = lookup_and_load_texture(content_manager, TinyPath("materials") / (texture_path + ".vtf"))
+            if side is None:
+                raise SkyboxException(f'Failed to load texture {texture_path}')
+            side = side.reshape((h, w, 4))
+            # Valve sky_hdr_compressed_rgbs_ps2x multiplies each sample RGB by
+            # alpha before filtering; sky_hdr_dx9 supplies InputScale = 8.
+            # Decode before cube-to-panorama interpolation to preserve radiance.
+            if material.get_string('$hdrcompressedtexture',None) and not material.get_string('$hdrbasetexture',None):
+                side=side.copy();side[:,:,:3]*=side[:,:,3:4]*8.;side[:,:,3]=1.
+            elif not material.get_string('$hdrbasetexture',None):
+                side=side.copy();rgb=side[:,:,:3]
+                side[:,:,:3]=np.where(rgb<=.04045,rgb/12.92,((rgb+.055)/1.055)**2.4)
+            side = np.flipud(side)
+            side = transform_sky_face(side,material)
+            max_s = max(max(side.shape), max_s)
+            if side.shape[0] < max_s or side.shape[1] < max_s:
+                side = pad_to(side, max_s)
+            side = np.rot90(side, 1)
+            if k == 'D':
+                side = np.rot90(side, 1)
+            elif k == 'U':
+                side = np.flipud(side)
+            sides[k] = side.T
+        eq_map = convert_to_eq(sides, 'dict', width // 2, width // 4, 'default', 'bilinear').T
+        hdr_main_texture = np.rot90(eq_map)
+        a_data = hdr_main_texture[:, :, 3].copy()
+        hdr_main_texture[:, :, 3] = np.ones_like(hdr_main_texture[:, :, 3])
+        hdr_alpha_texture = np.dstack([a_data, a_data, a_data, np.ones_like(a_data)])
+    return main_texture, hdr_main_texture, hdr_alpha_texture

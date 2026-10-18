@@ -1,0 +1,7 @@
+SpriteCard distance-alpha outlines (0.28.48)
+
+The converter reconstructs distance-field body thresholds and outline transitions for SpriteCard animated sprites with softedges disabled. Material outline RGB/alpha and per-particle glow RGB are separate from the body color. The outline vertex color follows the installed shader power-2.2 conversion. Both legacy and ordered Color Random births honor output field 22; ordinary RGB uses field 6.
+
+The Blink diagnostic now displays the authored contour shapes without the previous filled card backgrounds. Numerical Blender renders and save/reopen tests verify the node equations. Exact original SFM appearance, float32 shader precision, random/tick timing and full-duration parity remain unverified.
+
+Screen-space soft edges, dual-sequence/spline distance-alpha combinations, and non-animated-sprite distance geometry remain explicitly unsupported. Tinted field-22 initializers remain unsupported. Glow alpha currently uses the converter constant 1; authored glow-alpha initializers/operators are not implemented.

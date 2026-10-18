@@ -1,0 +1,44 @@
+0.28.43: nine new exact installed particle variants rendered from the extracted package, saved/reopened and inspected. Recorded output coverage: 35.7%; 3631 installed / 3103 built-in variants lack outcomes. Sparse/faint output is credited as presence evidence only; SFM visual parity and overall goal completion are not established.
+
+SourceBlendMaker 0.28.43 — experimental Velocity Noise births
+
+Enable Experimental particle noise initializers for supported box/sphere
+effects with Velocity Noise, whether or not Remap Noise to Scalar is present.
+The converter samples three correlated spatial/time noise channels, preserves
+independent absolute/invert flags and descending ranges, and applies a selected
+control point's birth rotation when local velocity is requested.
+
+For these births, ordinary settings run first and the first writer sets each
+attribute. Additive/override settings then run in their authored order. This
+keeps Velocity Noise on the correct side of position offsets and preserves
+original sequence-context indices. Scalar-only noise effects and ordinary
+conversions retain their previous behavior. Lifetime Random's omitted ordered
+sampler endpoints now use the installed zero defaults.
+
+The frozen distribution now includes particle_noise_tables.json beside its
+external worker scripts; this resource was missing from earlier staged ZIPs.
+
+Arithmetic evidence: 772 noise-core samples and 260 scalar velocity cases
+matched a Python interpreter of inspected installed SFM instructions, including
+all 64 component absolute/invert flag pairs and 130 local-transform queries.
+No Source DLL is loaded/executed by the diagnostic.
+
+Blender integration checks cover spawn/offset order, selected local rotation,
+additive velocity, velocity-only noise, and saved/reopened baked meshes.
+Original Portal 2 environmental_fx.pcf / Dust_Ceiling_Rumble_256Line_Debris
+is tested without modifying its PCF graph. Its fine debris is sparse: a 256px
+diagnostic produced 60 pixels over the threshold, while a 1024px diagnostic
+produced 368. Diagnostic controls and white tint are synthetic; Source lighting,
+full duration, engine random stream/ticks and SFM image parity remain unverified.
+
+Limitations: Position From Control Points and sequential paths write additional
+attributes not yet represented by this ordered adapter; combinations with
+Velocity Noise report that limitation. Parent/model spawning, maintained
+emitters, non-default shared strength/time gates, external world-time noise
+and unimplemented initializer combinations remain explicitly unsupported.
+Physical velocity integration approximates Source's timestep-scaled previous-
+position buffer rounding. This does not establish support for all particles.
+
+Detailed release results are in diagnostics/release_02843_native_validation.json
+in the development source tree. The released ZIP contains code and user guides,
+not the large development diagnostics or test .blend files.

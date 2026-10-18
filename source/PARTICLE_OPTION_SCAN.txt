@@ -1,0 +1,10 @@
+Particle option scanner
+
+Choose your SFM and Blender installations and a saved DMX session. Click Scan session particle options below the experimental particle options.
+If the conversion queue contains sessions, the scanner checks every queued session instead. Remove queued sessions to scan only the session selected at the top.
+
+The scanner runs in a separate background Blender process and uses the conversion asset mounts, extra asset folders and recorded PCF hints. It reads particle definitions and child effects plus their materials. It does not convert or render the scene.
+
+The report identifies known authored features, current checkbox state, and missing definitions/materials. Enable detected options turns on the reported options without turning off other choices. Settings are saved normally when starting conversion. Save report exports a text report.
+
+Detection is not proof of conversion support or visual accuracy. Unsupported feature combinations may still be rejected during conversion. Disabled particle modules are ignored. The scan includes particle systems saved in the session, including hidden or unused systems. A missing asset makes the result incomplete: do not interpret Not detected as proof that the feature is absent.

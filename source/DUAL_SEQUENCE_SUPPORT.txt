@@ -1,0 +1,55 @@
+Current recorded output outcomes after 0.28.40: 1982 visible + 3 expected-empty of 5648 installed variants; 3663 lack an outcome (35.1% recorded coverage). Built-ins: 1669 visible + 3 expected-empty of 4807; 3135 lack an outcome. This milestone adds 3 exact variants. Five component renders pass; small impact debris has only 58 pixels and receives no new credit. Coverage is not SFM visual parity or overall goal completion.
+
+Dual-sequence production integration — 0.28.40, 2026-10-15
+
+The ordinary animated SpriteCard baker now connects the verified secondary
+sequence initializer, installed CSheet table, four UV sets, two frame-blend
+attributes, secondary-frame zoom and three basic pixel blend modes.
+
+Verified foundations:
+- 131,072 initializer arithmetic comparisons over the installed random table.
+- 48,130 table records / 818,210 floats match an independent instruction model.
+- 2,880 decoded vertex evaluations / 23,040 UV components match zoom mapping.
+- 6,000 decoded pixel programs / 24,000 channels match the three blend modes.
+- Native tests check actual bake output, save/reopen, primary/secondary field
+  separation and repeated writes, and rendered color/opacity for all modes.
+- Source unit suite: 820 discovered, 792 passed, 28 Blender-only skipped.
+
+Real asset evidence:
+The complete installed HL2 fire_01.pcf / burning_engine_01 graph uses its
+original three definitions and actual VMT/VTF assets. All three components
+bake and render after save/reopen. This diagnostic supplies moving control
+points and white tint rather than the controls/light queries of an SFM scene.
+The force/translation-lock path additionally retains a per-birth sampled
+attachment fade, including rewind queries after detachment.
+
+Use in the GUI:
+Dual-sequence materials select this path automatically when supported.
+The engine test also enables Experimental delayed particle decay,
+Experimental particle attachment fades, and Experimental particle forces
+with translation locks. These simulation settings remain opt-in.
+
+Additional full graph attempted: HL2 impact_fx.pcf / impact_sheetrock.
+Its dual-sequence smoke component bakes, but the full graph remains incomplete:
+Collision via traces, Lifespan Minimum Velocity Decay and scalar roll on a
+non-sprite renderer are rejected explicitly. No whole-graph success is claimed.
+
+Remaining limitations:
+- Exact SFM visual parity, RNG streams, tick phase and texture filtering.
+- Depth blending and screen-size fades retain existing approximations/limits.
+- Dual clocks using animation_fit_lifetime or use animation rate as FPS.
+- Missing sequence aliases, degenerate table intervals and max-luminance blends.
+- Additional base textures, crop/green-alpha/ramp and spline material modes.
+- Other renderers, including maintained particles, need their own integration.
+
+This supersedes the disconnected-foundation status in the historical
+SECONDARY_SEQUENCE_NEXT_STEPS.txt, DUAL_SEQUENCE_RENDERER_NEXT_STEPS.txt and
+TABLE_ZOOM_IMPLEMENTATION_20261015.txt below. Historical JSON arithmetic
+receipts describe the stage at which they were produced; their old
+enabled_in_converter=false value is not the current production status.
+
+See release_02840_native_validation.json and dual_engine_isolated_20261015.json
+for packaged release evidence. Recorded output coverage is not visual parity
+or overall goal completion.
+
+Impact debris isolated render: only 58 pixels exceeded the gate. That diagnostic failed its visibility threshold; no new output credit is assigned to the debris. Other graph gaps above remain explicit.

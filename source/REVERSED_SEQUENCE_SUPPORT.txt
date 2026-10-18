@@ -1,0 +1,33 @@
+Current 0.28.42 recorded output coverage: 35.6%; 3640 installed / 3112 built-in variants lack outcomes. The HL2/Portal 2 droplet copies add 1 exact variant, counted once. Combined scalar/velocity-noise birth handling remains incomplete. This is output evidence, not SFM visual parity or overall goal completion.
+
+Primary random texture sequences — 0.28.42
+
+The non-shuffle/non-linear Sequence Random path now uses the installed SFM
+integer arithmetic, including reversed authored endpoints. For example,
+sequence_min=3 with omitted sequence_max=0 yields 3 or 2, using a signed span
+and truncation toward zero. Sorting the bounds would produce different output.
+
+Read-only evidence: installed PET primary initializer 0x10235a50, field 9,
+vtable 0x10414b24. All reachable branches were inspected. The production helper
+matches 266,240 independent SSE arithmetic comparisons over 65 installed
+ranges and the actual 4,096-value random table. No Source DLL was executed.
+Native geometry tests confirm both atlas choices and save/reopen persistence.
+
+The original HL2 water_impact.pcf and Portal 2 water_impact_unused.pcf copies
+of water_splash_02_droplets Version #2 now bake with actual VMT/VTF assets,
+save/reopen and visibly render. These share one exact definition-content
+variant; testing both sources does not count it twice.
+
+Source collection RNG alignment, engine timing and exact SFM appearance
+remain unverified. Reversed shuffle/linear contexts and sequence-lifetime
+combinations remain explicitly unsupported.
+
+Another reversed-range definition, Portal 2 Dust_Ceiling_Rumble_256Line_Debris,
+still fails on its combination of scalar noise and Velocity Noise. Enabling
+Experimental particle noise initializers passes planning but the ordered
+Velocity Noise scene handler is missing. No new output credit is claimed for
+that effect, and this release does not guess its motion.
+
+Full Python suite: 833 discovered, 802 passed, 31 Blender-only skipped.
+Packaged checks and asset receipts are recorded in the source workspace at
+diagnostics/release_02842_native_validation.json.

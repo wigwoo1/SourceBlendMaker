@@ -1,0 +1,21 @@
+SourceBlendMaker 0.28.50
+
+Build on Windows with Python 3.12 and a working Tk runtime. The release uses PyInstaller onedir packaging so startup does not require one-file extraction to a temporary directory.
+
+python -m pip install pyinstaller
+python -m PyInstaller --onedir --windowed --name SourceBlendMaker --distpath . --paths . app.py
+
+Keep all adjacent .py modules and vendor/ beside the EXE. The Blender worker
+loads these modules separately from the packaged GUI.
+
+Run tests:
+python -m unittest discover -s tests -v
+
+Packaged GUI startup test:
+SourceBlendMaker.exe --self-test startup-test.json
+
+
+After PyInstaller finishes, run: python stage_release.py PATH_TO_DIST/SourceBlendMaker
+This copies root worker modules, vendor and all Python package folders, including particle_tint_lighting.
+
+

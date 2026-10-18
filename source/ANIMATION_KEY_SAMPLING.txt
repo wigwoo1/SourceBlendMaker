@@ -1,0 +1,5 @@
+Animation keyframe rate
+
+The default value 0 keeps the converter's full-rate keys. Enter a lower key rate to reduce key density for model root motion, skeletal bones and facial flexes. For example, a 30 FPS key rate on a 60 FPS SFM session keeps about every other key and preserves the first and last samples. Blender linearly interpolates between the retained keys while the scene still plays at the original 60 FPS.
+
+Non-integer rates are supported by placing keys at fractional Blender frame positions. Constant/discrete curves, particle bakes, sound, lights and other non-model data keep their existing sampling. This is a lossy simplification for animation with rapid changes; inspect the motion before final rendering. Use 0 to retain every key.

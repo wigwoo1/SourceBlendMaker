@@ -1,0 +1,122 @@
+{
+  "binary_sha256": "340b0278d7258015a1bd9fd6cc4068d593469dee999eec15667f85a776f5e506",
+  "runtime_code_executed": false,
+  "builder": "0x1023f230",
+  "factory_parameter_pointer": "0x10506d78",
+  "registration_chain_verified": true,
+  "parameters": [
+    {
+      "name": "oscillation field",
+      "default": "0",
+      "instance_offset": "0x9c",
+      "name_instruction": "0x1023f7c2",
+      "default_instruction": "0x1023f7cc",
+      "offset_instruction": "0x1023f7dc"
+    },
+    {
+      "name": "offset instead of accelerate position",
+      "default": "0",
+      "instance_offset": "0xa2",
+      "name_instruction": "0x1023f810",
+      "default_instruction": "0x1023f81a",
+      "offset_instruction": "0x1023f826"
+    },
+    {
+      "name": "oscillation rate min",
+      "default": "0 0 0",
+      "instance_offset": "0x6c",
+      "name_instruction": "0x1023f859",
+      "default_instruction": "0x1023f863",
+      "offset_instruction": "0x1023f877"
+    },
+    {
+      "name": "oscillation rate max",
+      "default": "0 0 0",
+      "instance_offset": "0x78",
+      "name_instruction": "0x1023f8aa",
+      "default_instruction": "0x1023f8b4",
+      "offset_instruction": "0x1023f8c8"
+    },
+    {
+      "name": "oscillation frequency min",
+      "default": "1 1 1",
+      "instance_offset": "0x84",
+      "name_instruction": "0x1023f8fb",
+      "default_instruction": "0x1023f905",
+      "offset_instruction": "0x1023f919"
+    },
+    {
+      "name": "oscillation frequency max",
+      "default": "1 1 1",
+      "instance_offset": "0x90",
+      "name_instruction": "0x1023f94c",
+      "default_instruction": "0x1023f956",
+      "offset_instruction": "0x1023f96a"
+    },
+    {
+      "name": "proportional 0/1",
+      "default": "1",
+      "instance_offset": "0xa0",
+      "name_instruction": "0x1023f99d",
+      "default_instruction": "0x1023f9a7",
+      "offset_instruction": "0x1023f9b3"
+    },
+    {
+      "name": "start time min",
+      "default": "0",
+      "instance_offset": "0xa4",
+      "name_instruction": "0x1023f9e6",
+      "default_instruction": "0x1023f9f0",
+      "offset_instruction": "0x1023f9fc"
+    },
+    {
+      "name": "start time max",
+      "default": "0",
+      "instance_offset": "0xa8",
+      "name_instruction": "0x1023fa2b",
+      "default_instruction": "0x1023fa35",
+      "offset_instruction": "0x1023fa41"
+    },
+    {
+      "name": "end time min",
+      "default": "1",
+      "instance_offset": "0xac",
+      "name_instruction": "0x1023fa70",
+      "default_instruction": "0x1023fa7a",
+      "offset_instruction": "0x1023fa86"
+    },
+    {
+      "name": "end time max",
+      "default": "1",
+      "instance_offset": "0xb0",
+      "name_instruction": "0x1023fad5",
+      "default_instruction": "0x1023faa1",
+      "offset_instruction": "0x1023fadf"
+    },
+    {
+      "name": "start/end proportional",
+      "default": "1",
+      "instance_offset": "0xa1",
+      "name_instruction": "0x1023fb0e",
+      "default_instruction": "0x1023faa7",
+      "offset_instruction": "0x1023fb1e"
+    },
+    {
+      "name": "oscillation multiplier",
+      "default": "2",
+      "instance_offset": "0xb4",
+      "name_instruction": "0x1023fb51",
+      "default_instruction": "0x1023fb5b",
+      "offset_instruction": "0x1023fb65"
+    },
+    {
+      "name": "oscillation start phase",
+      "default": ".5",
+      "instance_offset": "0xb8",
+      "name_instruction": "0x1023fb94",
+      "default_instruction": "0x1023fb9e",
+      "offset_instruction": "0x1023fba8"
+    }
+  ],
+  "full_particle_simulation_verified": false
+}

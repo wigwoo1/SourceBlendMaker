@@ -1,0 +1,5 @@
+Particle yaw ramps (0.28.47)
+
+Ramp Scalar Linear Random can now animate yaw (field 12) independently from roll. Rates and stored yaw use radians. Birth-sampled rate/time ranges feed the existing chronological angular history. SpriteCard geometry consumes the resulting yaw at each baked sample. Disabled ramps retain existing behavior; default yaw zero works without a yaw initializer. Unverified camera-facing CPU geometry and non-sprite renderers remain gated.
+
+Blender synthetic tests verify rotation in depth and save/reopen. The original Blink smoke hierarchy also bakes completely. Independent renders show all three components. Version 0.28.48 reconstructs their distance-alpha outlines; the previous card-background artifact is absent in the inspected diagnostic. This is output validation, not exact Source rendering or simulation parity. Source random streams, ticks, parent active-buffer ordering and shader rounding remain approximate.

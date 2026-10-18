@@ -1,0 +1,35 @@
+Animated CPU trail widths - 0.28.44
+
+Full Oscillate Scalar on width (field 3) now works for render_sprite_trail
+with UnlitGeneric materials. No experimental checkbox is required. Positive,
+zero and negative animated widths are retained; negative values exchange the
+two sides while keeping texture-corner assignments. Rotation (field 4) and
+full width oscillation on GPU SpriteCard spline trails remain gated.
+
+UnlitGeneric trails now use the installed CPU corner layout: half the signed
+width on each side, perspective eye-relative orientation, current-to-tail
+texture order, and the signed radius-to-length constraint (default enabled).
+Other material paths retain their previous approximate trail geometry.
+
+Evidence is read-only inspection of installed PET DLL SHA256
+340b0278d7258015a1bd9fd6cc4068d593469dee999eec15667f85a776f5e506:
+- Trail instance vtable 0x1041e79c; render method 0x10294510.
+- CPU vertex builder 0x10293e90; half-width constants 0x1039e75c (.5)
+  and 0x103ba1bc (-.5); node radius at offset 8 is used without abs/clamp.
+- Constraint metadata: name 0x1041de78, member 0xc0, default string
+  0x103a1850 (1), registration builder 0x10287a90.
+- Four corner UVs are (u0,v1), (u1,v1), (u1,v0), (u0,v0), with Blender V
+  inversion supplied by the existing sheet sampler. The CPU builder does
+  not consume the particle yaw-flip attribute.
+No Source DLL or GPU shader was executed during this inspection.
+
+Tests check signed width, the asymmetric constraint, off-axis orientation,
+zero/parallel degeneracy, native UV and alpha preservation, unchanged motion,
+save/reopen, and explicit rejection of the unverified GPU radius path.
+
+The original installed HL2 impact_fx.pcf / impact_asphalt_cheap graph is the
+integration benchmark, including its impact_generic_burst child. Synthetic
+controls, two-second samples and white tint do not establish exact SFM visual
+parity. Source random streams, per-tick motion history, oscillator integration,
+texture filtering, depth intersections and GPU trail shading remain approximate
+or unverified. No claim of complete particle support is made.

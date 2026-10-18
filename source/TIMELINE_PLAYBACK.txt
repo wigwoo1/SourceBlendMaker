@@ -1,0 +1,9 @@
+Shot-by-shot and continuous playback
+
+Every converted SFM shot is retained as its own Blender scene. The converter also creates an SFM Master Timeline scene with one sequencer strip per shot, positioned at the shot's session start, plus the session audio. Open the SFM Timeline workspace to play the edit continuously.
+
+In the converter, enable 'Open Blender on the continuous master timeline' to have the Open in Blender button switch to that workspace. With the option off, Blender opens on the first shot, as before. You can switch between the SFM Timeline workspace and the individual shot scenes at any time.
+
+The master sequence is designed for playback and rendering. The individual shot scenes remain available for editing and camera review. Particle and other simulation features retain the converter's documented approximation and support limits.
+
+The master scene also contains a camera for each shot. Camera markers switch the active master camera at each cut. Camera motion, lens animation and parent motion follow the shot strip's position and source timing. Ordinary camera actions are shared through native Blender NLA strips, so they retain their interpolation and do not require scripts or duplicate animation keys. Constrained cameras and cameras with focus-object targets are baked at each output frame. Full-scene playback and rendering continue through the sequencer; individual shot scenes remain available for editing.

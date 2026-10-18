@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.build/
+dist/
+*.spec
+source/diagnostics/*
+!source/diagnostics/sourceblendmaker_capture.py
+source/outputs/
+settings.json
+*.log

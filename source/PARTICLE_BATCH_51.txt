@@ -1,0 +1,5 @@
+Historical 0.28.41 batch: its reversed-range failure is fixed and tested in 0.28.42. The original batch record below is preserved.
+
+Packaged 0.28.41 batch 51: 22 isolated definitions tested; 21 saved/reopened renders inspected and 21 new exact variants credited. Current output coverage: 35.5%; 3641 installed / 3113 built-in variants lack outcomes. The remaining candidate has an unsupported sequence range. Original child graphs, map lighting and Source visual parity were not tested. Scout capsule appearance and cropped foam framing remain flagged.
+
+Fresh installed PCF hashes match every tested definition. Native files and images have unique content-hash filenames. Detailed evidence: outputs/current_F_unrendered_candidates_batch_51.json in the source workspace.

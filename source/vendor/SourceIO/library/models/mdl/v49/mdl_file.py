@@ -1,0 +1,131 @@
+import struct
+import traceback
+from dataclasses import dataclass
+
+from SourceIO.library.models.mdl.structs.attachment import Attachment
+from SourceIO.library.models.mdl.structs.bodygroup import BodyPart
+from SourceIO.library.models.mdl.structs.bone import Bone
+from SourceIO.library.models.mdl.structs.flex import FlexController, FlexControllerUI, FlexRule
+from SourceIO.library.models.mdl.structs.header import MdlHeaderV49
+from SourceIO.library.models.mdl.structs.local_animation import StudioAnimDesc
+from SourceIO.library.models.mdl.structs.material import MaterialV49
+from SourceIO.library.models.mdl.structs.sequence import StudioSequence
+from SourceIO.library.models.mdl.v44.mdl_file import MdlV44
+from SourceIO.library.utils import Buffer
+from SourceIO.library.utils import kv1
+from SourceIO.logger import SourceLogMan
+
+log_manager = SourceLogMan()
+logger = log_manager.get_logger('MDL49')
+
+
+@dataclass(slots=True)
+class MdlV49(MdlV44):
+    header: MdlHeaderV49
+
+    @classmethod
+    def from_buffer(cls, buffer: Buffer):
+        header = MdlHeaderV49.from_buffer(buffer)
+
+        bones = []
+        buffer.seek(header.bone_offset)
+        for bone_id in range(header.bone_count):
+            bone = Bone.from_buffer(buffer, header.version)
+            bone.bone_id = bone_id
+            bones.append(bone)
+
+        materials = []
+        buffer.seek(header.texture_offset)
+        for _ in range(header.texture_count):
+            texture = MaterialV49.from_buffer(buffer, header.version)
+            materials.append(texture)
+
+        materials_paths = []
+        buffer.seek(header.texture_path_offset)
+        for _ in range(header.texture_path_count):
+            materials_paths.append(buffer.read_source1_string(0))
+
+        skin_groups = []
+        buffer.seek(header.skin_family_offset)
+        for _ in range(header.skin_family_count):
+            skin_group = []
+            for _ in range(header.skin_reference_count):
+                texture_index = buffer.read_uint16()
+                skin_group.append(materials[texture_index])
+            skin_groups.append(skin_group)
+
+        flex_names = []
+        buffer.seek(header.flex_desc_offset)
+        for _ in range(header.flex_desc_count):
+            flex_names.append(buffer.read_source1_string(buffer.tell()))
+
+        flex_controllers = []
+        buffer.seek(header.flex_controller_offset)
+        for _ in range(header.flex_controller_count):
+            controller = FlexController.from_buffer(buffer, header.version)
+            flex_controllers.append(controller)
+
+        flex_rules = []
+        buffer.seek(header.flex_rule_offset)
+        for _ in range(header.flex_rule_count):
+            rule = FlexRule.from_buffer(buffer, header.version)
+            flex_rules.append(rule)
+
+        attachments = []
+        buffer.seek(header.local_attachment_offset)
+        for _ in range(header.local_attachment_count):
+            attachment = Attachment.from_buffer(buffer, header.version)
+            attachments.append(attachment)
+
+        flex_ui_controllers = []
+        buffer.seek(header.flex_controller_ui_offset)
+        for _ in range(header.flex_controller_ui_count):
+            flex_controller = FlexControllerUI.from_buffer(buffer, header.version)
+            flex_ui_controllers.append(flex_controller)
+
+        body_parts = []
+        buffer.seek(header.body_part_offset)
+        for _ in range(header.body_part_count):
+            body_part = BodyPart.from_buffer(buffer, header.version)
+            body_parts.append(body_part)
+
+        local_animations = []
+        buffer.seek(header.local_animation_offset)
+        for _ in range(header.local_animation_count):
+            local_animations.append(StudioAnimDesc.from_buffer(buffer))
+
+        local_sequences = []
+        buffer.seek(header.local_sequence_offset)
+        for _ in range(header.local_sequence_count):
+            local_sequences.append(StudioSequence.from_buffer(buffer, header.version))
+
+        animations = []
+        for anim_desc in local_animations:
+            try:
+                animations.append(anim_desc.read_animations(buffer, bones))
+            except (AssertionError, ValueError, struct.error):
+                traceback.print_exc()
+                animations.extend([None] * (len(animations) - len(local_animations)))
+                break
+
+        include_models = []
+        buffer.seek(header.include_model_offset)
+        for inc_model in range(header.include_model_count):
+            entry = buffer.tell()
+            label = buffer.read_source1_string(entry)
+            path = buffer.read_source1_string(entry)
+            include_models.append(path)
+
+        buffer.seek(header.key_value_offset)
+        key_values_raw = buffer.read(header.key_value_size).strip(b'\x00').decode('latin1')
+        # A bare sequence of `{ ... }` blocks; the parser reports damage itself and
+        # never raises, so a broken blob costs the keyvalues rather than the model.
+        key_values = kv1.KV1Block()
+        if key_values_raw:
+            blocks = kv1.loads_blocks(key_values_raw, 'mdl keyvalues')
+            if blocks:
+                key_values = blocks[0]
+
+        return cls(header, bones, skin_groups, materials, materials_paths, flex_names, flex_controllers,
+                   flex_ui_controllers, flex_rules, body_parts, attachments, local_animations, local_sequences,
+                   animations, key_values_raw, key_values, include_models)

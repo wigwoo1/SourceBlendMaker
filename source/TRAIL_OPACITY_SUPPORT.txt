@@ -1,0 +1,36 @@
+0.28.41 recorded output coverage: 35.2%; 3662 installed variants and 3134 built-in variants remain without outcomes. Added 1 exact variant through verified Portal 2 trail-opacity output. This is diagnostic output coverage, not Source visual parity or overall goal completion.
+
+Full scalar trail opacity — 0.28.41
+
+The ordinary sprite-trail renderer now accepts Oscillate Scalar on opacity
+(field 7, including the omitted field default). It uses the existing ordered
+opacity evaluator with per-birth sampled parameters and fade ordering.
+No additional GUI setting is needed.
+
+Missing oscillation rate bounds default to 0; missing frequency bounds default
+to 1. The remaining field, clock, window, multiplier and phase defaults were
+also checked against the installed PET factory metadata. The read-only trace
+links factory 0x104193bc through metadata 0x10506da0 to builder 0x1023e160;
+all 13 scalar defaults match production. No Source DLL was executed.
+
+Verified diagnostic: original Portal 2 robot_fx.pcf / bot_death_B_sparkles_1,
+actual VMT/VTF and unmodified definition, synthetic moving controls/white tint.
+It bakes all its rendering components, survives native save/reopen and renders
+visibly. Source fixture tests separately verify changing trail opacity at two
+ages with unchanged geometry/motion and persistent saved alpha attributes.
+
+Full Python suite: 828 discovered; 798 passed; 30 Blender-only tests skipped.
+See diagnostics/release_02841_native_validation.json in the source workspace
+for extracted ZIP checks and the real asset receipt.
+
+Remaining limitations:
+- Source RNG alignment, engine ticks, filtering and exact SFM appearance.
+- Full scalar radius/roll oscillation on trails; rope oscillation.
+- Workshop emp_flashing_sparkles still uses repeated Movement Basic operators
+  requiring ordered simulation work; this release does not claim it works.
+- HL2 impact_sheetrock still has collision, minimum-velocity decay and trail
+  radius gaps, all reported explicitly rather than discarded silently.
+
+Recorded output coverage is not a measure of exact SFM visual parity or overall
+goal completion. Existing shot cameras, individual shots and master timeline
+remain available.
