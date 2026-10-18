@@ -52,6 +52,6 @@ Tests needing Blender or original local game assets are separate or skipped outs
 
 ## Publishing
 
-Source is synchronized from the development workspace after review and testing. Windows ZIPs are distributed as release assets rather than committed to Git history. The 0.28.50 release also includes retained 0.28.48 and 0.28.49 binaries for reference; the source snapshot/tag corresponds to 0.28.50 only. Daily local publishing is requested but its Codex schedule is not yet active because automatic approval review hit an account usage limit.
+Source is synchronized from the development workspace after review and testing. Windows ZIPs are distributed as release assets rather than committed to Git history. The 0.28.50 release also includes retained 0.28.48 and 0.28.49 binaries for reference; the source snapshot/tag corresponds to 0.28.50 only. Daily synchronization is maintained separately from application releases.
 
 This repository intentionally excludes local settings, conversion diagnostics, user sessions, SFM/game/workshop assets and generated converted projects. The `.blend` files under SourceIO's bundled assets are upstream shader-library resources, not user projects.
