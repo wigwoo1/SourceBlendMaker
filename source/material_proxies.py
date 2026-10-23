@@ -20,6 +20,12 @@ def prepare(gm,shot,seconds,assets):
         buffer=assets.buffer('materials/'+path+'.vmt')
         if buffer is None:continue
         vmt=VMT(buffer,assets.TinyPath('materials/'+path+'.vmt'),assets.cm)
+        from terrain_material_controls import neutral
+        neutral_keys=neutral(path,vmt,controls,shot,seconds)
+        consumed.update((path,key) for key in neutral_keys)
+        if neutral_keys:
+            records.append({'material':path,'neutral_controls':sorted(neutral_keys),
+                            'samples':len(seconds),'reason':'Identity texture transforms or disabled detail/reflection contribution on terrain-plane template'})
         proxies=vmt.data.get('proxies')
         if proxies is None:continue
         operations=[]

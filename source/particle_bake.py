@@ -601,7 +601,8 @@ def _bake(system,descriptor,shot,scene,frames,seconds,fps,materials,curves_facto
             if has_tint and tint_provider is not None and maintained:
                 raise ValueError('Tint provider for maintained particle lifecycle is unverified')
             use_shared_maintained=False
-            if maintained:
+            from particle_maintained_route import native_velocity_noise
+            if maintained and not native_velocity_noise(definition):
                 try:
                     plan(definition,{} if simulation_only else json.loads(materials[path].get('sfm_particle_sheet','{}')))
                     use_shared_maintained=True
@@ -611,7 +612,12 @@ def _bake(system,descriptor,shot,scene,frames,seconds,fps,materials,curves_facto
                 from maintained_sprites import bake as bake_maintained
                 path=definition['parameters']['material'].replace('\\','/')
                 maintained_record=bake_maintained(system,definition,descriptor,shot,scene,frames,seconds,materials[path],curves_factory,scale)
-                maintained_record['material_path']=path;records.append(maintained_record)
+                maintained_record['material_path']=path
+                maintained_record['instance_id']=definition.get('instance_id')
+                maintained_record['parent_instance_id']=definition.get('parent_instance_id')
+                if native_velocity_noise(definition):
+                    maintained_record.setdefault('limitations',[]).append('Velocity Noise uses the maintained-count lifecycle path even when experimental ordered noise is enabled; replacement-slot sampling and motion remain approximate.')
+                records.append(maintained_record)
                 continue
             material={} if simulation_only else materials[path]
             if material.get('sfm_particle_texture_recovery'):record['texture_recovery']=json.loads(material['sfm_particle_texture_recovery'])

@@ -1,0 +1,8 @@
+SourceBlendMaker 0.28.51
+
+Terrain-plane identity transforms and disabled reflection/detail controls are recognized without blanket suppression of active material warnings.
+Fog2 with experimental ordered noise enabled now uses the existing approximate maintained-count lifecycle instead of being skipped.
+
+Validation: 141 terrain models inspected against the original installed VMT; original Fog2 isolated two-second bake, save/reopen and visible render passed. Full booty.dmx conversion was not performed.
+
+Remaining: snow Collision via traces with session model geometry is unsupported. The referenced particles/bdfireparticles.pcf is absent from this installation; provide the original asset pack on the conversion machine. This release does not manufacture missing assets or discard collision constraints.

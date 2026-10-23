@@ -1,4 +1,4 @@
-SourceBlendMaker 0.28.50
+SourceBlendMaker 0.28.51
 
 Build on Windows with Python 3.12 and a working Tk runtime. The release uses PyInstaller onedir packaging so startup does not require one-file extraction to a temporary directory.
 
