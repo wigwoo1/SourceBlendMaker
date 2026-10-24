@@ -37,7 +37,7 @@ def read_brushes(raw):
             'scope':'Brush geometry only; displacements, transformed submodels and MDL collision are not resolved'}
 
 
-def read_world_brushes(raw):
+def read_model_brushes(raw,model_index=0):
     geometry=read_brushes(raw)
     def lump(index,stride,versions=(0,)):
         offset,length,revision,compressed=struct.unpack_from('<4i',raw,8+16*index)
@@ -48,12 +48,14 @@ def read_world_brushes(raw):
         return raw[offset:offset+length]
     models=list(struct.iter_unpack('<9f3i',lump(14,48)))
     if not models:raise ValueError('Missing BSP world model')
+    if not isinstance(model_index,int) or not 0<=model_index<len(models):
+        raise ValueError('Invalid BSP collision model index')
     nodes=list(struct.iter_unpack('<3i6h2H2h',lump(5,32)))
     leaf_revision=struct.unpack_from('<i',raw,8+16*10+8)[0]
     leaves=lump(10,56 if leaf_revision==0 else 32,(0,1))
     leaf_size=56 if leaf_revision==0 else 32
     references=list(struct.iter_unpack('<H',lump(17,2)))
-    selected=set();visited=set();pending=[models[0][9]]
+    selected=set();visited=set();pending=[models[model_index][9]]
     while pending:
         index=pending.pop()
         if index>=0:
@@ -70,4 +72,9 @@ def read_world_brushes(raw):
                 selected.add(ref[0])
     return {**geometry,'brushes':[geometry['brushes'][i] for i in sorted(selected)],
             'all_brush_count':len(geometry['brushes']),'world_node_count':len(visited),
-            'scope':'World BSP brushes only; displacements, brush entities and MDL collision remain separate'}
+            'model_index':model_index,'model_count':len(models),
+            'scope':'Selected BSP model brush planes; entity transforms and MDL collision remain separate'}
+
+
+def read_world_brushes(raw):
+    return read_model_brushes(raw,0)

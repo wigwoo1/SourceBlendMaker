@@ -1189,7 +1189,7 @@ def convert(job):
             try:
                 collision_trace,collision_report=prepare_particle_collision(session,shot,assets)
                 collision_report={**collision_report,'production_enabled':True,'approximate':True,'shot':shot.element.name}
-                warn('Particle collision: approximate world-brush kill traces; Source cached-plane behavior and boundary epsilon differ.')
+                warn('Particle collision: approximate BSP brush kill traces, including supported static brush entities; Source cached-plane behavior, VPhysics shapes and boundary epsilon differ.')
             except Exception as exc:
                 collision_report={'shot':shot.element.name,'production_enabled':False,'reason':str(exc)}
                 warn('Particle trace collision unavailable: '+str(exc))

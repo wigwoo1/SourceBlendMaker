@@ -2,7 +2,7 @@
 
 Windows GUI for converting saved Source Filmmaker DMX sessions into Blender projects.
 
-Current verified Windows build: **0.28.50**. Download the Windows ZIP from [Releases](https://github.com/wigwoo1/SourceBlendMaker/releases/latest). Extract the entire folder and run `SourceBlendMaker.exe`.
+Current verified Windows build: **0.28.52**. Download the Windows ZIP from [Releases](https://github.com/wigwoo1/SourceBlendMaker/releases/latest). Extract the entire folder and run `SourceBlendMaker.exe`.
 
 ## Features
 
@@ -18,7 +18,7 @@ This is an actively developed converter. Source shaders, particles, timing, ligh
 
 Recorded installed-particle output coverage is 36.17%, with 3,605 unresolved definition variants (3,077 built-in). This measures recorded output outcomes, not exact SFM visual matching or overall project completion.
 
-Version 0.28.50 verification: 876 unit tests passed; 50 native-only tests skipped. Packaged GUI startup and the particle scanner were checked against a local session containing 15 particle definition instances.
+Version 0.28.52 verification: 890 unit tests passed; 50 native-only tests skipped. Packaged GUI startup and release integrity passed. Original project map validation covered 17 static brush entities (1,440 brushes); the original snow definition passed a synthetic-floor Blender bake and save/reopen test. Session-model collision remains unsupported; this is not full-session validation.
 
 ## Assets and dependencies
 

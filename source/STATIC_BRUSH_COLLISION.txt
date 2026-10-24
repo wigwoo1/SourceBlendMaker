@@ -1,0 +1,9 @@
+SourceBlendMaker 0.28.52
+
+Supported: unnamed, unparented, axis-aligned func_brush entities. Model-specific BSP leaf references select collision brushes, entity origin translates the planes, and source contents and particle radius are preserved. Never-solid and disabled toggle-solid entities do not collide; always-solid entities still collide when hidden.
+
+Solidity reference: https://github.com/ValveSoftware/source-sdk-2013/blob/master/src/game/server/modelentities.cpp
+
+Limits: BSP planes approximate VPhysics shapes. Source collision caching, epsilon and tick ordering are not reproduced. Rotated, named, parented, filtered and other entity types remain rejected. Brush-only filtering with entity geometry is not verified and is rejected. Session model collision and displacements remain unsupported.
+
+Evidence: 890 unit tests passed, 50 native-only skipped. Original security_breach_map_no_lights.bsp resolved 17 static entities containing 1440 brushes; 340 local/world translation comparisons passed. Original booty snow_1024 definition used unchanged in a synthetic floor test: 250 final quads with non-solid floor versus 136 with solid floor; save/reopen matched. Full booty.dmx conversion was not run. No additional installed-particle coverage is credited by this test.

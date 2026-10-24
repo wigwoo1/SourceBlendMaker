@@ -666,7 +666,7 @@ def _bake(system,descriptor,shot,scene,frames,seconds,fps,materials,curves_facto
                 record['pull_lock_limitations']=['Development translation-only chronological history; Source timing, RNG and visual parity unverified']
             from particle_renderers import spline_ring_enabled
             collision_modules=[m for m in enabled(definition,'constraints') if m['function']=='Collision via traces']
-            collision_config=None;collision_histories={}
+            collision_config=None;collision_histories={};definition_collision_trace=collision_trace
             secondary_histories={}
             secondary_operators=[m['parameters'] for m in enabled(definition,'operators') if m['function']=='Oscillate Scalar Simple' and m['parameters'].get('oscillation field',7)==16]
             if collision_modules and collision_trace is not None:
@@ -677,12 +677,15 @@ def _bake(system,descriptor,shot,scene,frames,seconds,fps,materials,curves_facto
                     raise ValueError('Combined trace and other constraints are unverified')
                 from particle_collision_settings import settings as collision_settings
                 collision_config=collision_settings(collision_modules[0]['parameters'])
+                if hasattr(collision_trace,'for_settings'):
+                    definition_collision_trace=collision_trace.for_settings(collision_config)
                 planned_definition={**planned_definition,'modules':{**planned_definition['modules'],
                     'constraints':[m for m in planned_definition['modules']['constraints'] if m['function']!='Collision via traces']}}
                 collision_scene=descriptor.get('collision_scene',{})
                 record['development_trace_collision']=not collision_scene.get('production_enabled',False)
                 record['world_brush_trace_collision']=bool(collision_scene.get('production_enabled',False))
-                record['collision_limitations']=['World brushes only; model and displacement collisions are not implemented',
+                record['collision_limitations']=list(collision_scene.get('limitations',[
+                    'World brushes only; model and displacement collisions are not implemented']))+[
                     '120 Hz swept radius hull; Source trace caching, boundary epsilon, RNG and tick ordering differ']
             ring_enabled=spline_ring_enabled(planned_definition,material,experimental_spline)
             parent_initializer=None;parent_context=None
@@ -1244,7 +1247,7 @@ def _bake(system,descriptor,shot,scene,frames,seconds,fps,materials,curves_facto
                             def collision_radius(t,b=birth,life=lifetime,initial=initial_radius):
                                 value,_=appearance(definition,t,life,initial,fades[b.index],creation_time=b.simulation_time,oscillation_samples=states[b.index].get('scalar_oscillations'))
                                 return value*collision_config['radius scale']
-                            collision_histories[birth.index]=KillHistory(collision_position,collision_radius,collision_trace)
+                            collision_histories[birth.index]=KillHistory(collision_position,collision_radius,definition_collision_trace)
                         is_alive=collision_histories[birth.index].alive(age)
                         set_time(float(time))
                         if not is_alive:continue

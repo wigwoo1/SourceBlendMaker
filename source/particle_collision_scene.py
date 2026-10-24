@@ -1,4 +1,4 @@
-"""Eligibility checks for world-brush-only particle collision development."""
+"""World and supported static brush-entity collision, with explicit scope gates."""
 import struct
 import re
 from bsp_collision import read_world_brushes
@@ -7,6 +7,17 @@ from particle_brush_trace import PreparedBrushTracer
 # Installed pet.dll helper 0x101f6a30 passes this mask at 0x101f6a98.
 # This verifies the query mask, not Source cached-plane response parity.
 TRACE_CONTENTS_MASK=0x0200400B
+
+
+class SceneBrushTracer(PreparedBrushTracer):
+    def __init__(self,brushes,has_entities):
+        super().__init__(brushes,contents_mask=TRACE_CONTENTS_MASK)
+        self.has_entities=has_entities
+
+    def for_settings(self,settings):
+        if self.has_entities and settings['brush only']:
+            raise ValueError('Brush-only filtering with map brush entities is not verified')
+        return self
 
 
 def required(descriptors):
@@ -36,7 +47,7 @@ def prepare(session,shot,assets):
     return provider,report
 
 
-def _check_entities(payload):
+def _check_entities(payload,allow_static=False):
     """Reject geometry-bearing entities, including dynamic props outside sprp."""
     text=payload.rstrip(b'\0').decode('utf-8',errors='strict')
     token=re.compile(r'\s+|//[^\n]*|[{}]|"(?:[^"\\]|\\.)*"')
@@ -46,7 +57,7 @@ def _check_entities(payload):
         value=match.group();cursor=match.end()
         if not value.isspace() and not value.startswith('//'):tokens.append(value)
     if cursor!=len(text):raise ValueError('Unsupported collision entity syntax')
-    index=0
+    index=0;geometry_entities=[]
     while index<len(tokens):
         if tokens[index]!='{':raise ValueError('Invalid collision entity block')
         index+=1;fields={}
@@ -58,7 +69,9 @@ def _check_entities(payload):
         if index>=len(tokens):raise ValueError('Unclosed collision entity block')
         index+=1
         if fields.get('model') or fields.get('classname','').lower().startswith(('prop_','func_')):
-            raise ValueError('Particle collision with map model or brush entities is not implemented')
+            if not allow_static:raise ValueError('Particle collision with map model or brush entities is not implemented')
+            geometry_entities.append(fields)
+    return geometry_entities
 
 
 def world_provider(raw,session_model_count):
@@ -69,8 +82,8 @@ def world_provider(raw,session_model_count):
         if offset<0 or length<0 or offset+length>len(raw):raise ValueError('Collision scene lump outside BSP')
         if compressed or raw[offset:offset+4]==b'LZMA':raise ValueError('Compressed collision scene inspection unsupported')
         return raw[offset:offset+length]
-    if len(lump(14))!=48:raise ValueError('Particle collision with brush submodels is not implemented')
-    _check_entities(lump(0))
+    from particle_brush_entities import resolve as resolve_brush_entities
+    entity_brushes,entity_records=resolve_brush_entities(raw,_check_entities(lump(0),allow_static=True),geometry['model_count'])
     if lump(26):raise ValueError('Particle collision with displacement surfaces is not implemented')
     game=lump(35)
     if game:
@@ -90,9 +103,11 @@ def world_provider(raw,session_model_count):
             if leaves<0 or cursor+4>len(payload):raise ValueError('Invalid collision static prop leaf table')
             props=struct.unpack_from('<i',payload,cursor)[0]
             if props!=0:raise ValueError('Particle collision with static props is not implemented')
-    return PreparedBrushTracer(geometry['brushes'],contents_mask=TRACE_CONTENTS_MASK),{'world_brush_count':len(geometry['brushes']),
-        'scope':'World brush geometry; no model, displacement or brush entity collision required',
+    return SceneBrushTracer(geometry['brushes']+entity_brushes,bool(entity_brushes)),{'world_brush_count':len(geometry['brushes']),
+        'static_brush_entities':entity_records,'entity_brush_count':len(entity_brushes),
+        'scope':'World brushes and supported static axis-aligned func_brush entities',
         'source_engine_parity':False,'production_enabled':False,
         'contents_mask':TRACE_CONTENTS_MASK,'contents_filter_verified':True,
-        'limitations':['World brushes only; collision with models and displacements is not implemented',
+        'limitations':['Model, displacement, moving/rotated/named brush and other entity collisions are not implemented',
+                       'Static func_brush BSP planes approximate engine VPhysics collision shapes',
                        'Source cached-plane tracing and boundary epsilon are not reproduced']}
